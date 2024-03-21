@@ -2,7 +2,7 @@
 
 
 [![License](https://img.shields.io/badge/License-CC%20By%20NC%204.0-orange.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
-[![Data Link](https://img.shields.io/badge/Download-data-green.svg)](https://bird-bench.github.io/)
+[![Data Link](https://img.shields.io/badge/Download-data-green.svg)]([https://bird-bench.github.io/](https://huggingface.co/datasets/patrickNLP/tapilot-crossing/tree/main))
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10+-teal.svg)](https://www.python.org/downloads/release/python-390/)
 [![Project Page 1.8+](https://img.shields.io/badge/project-page-pink.svg)](https://tapilot-crossing.github.io/)
 [![OpenAI 0.28.1](https://img.shields.io/badge/OpenAI-0.28.1-beige.svg)](https://www.python.org/downloads/release/python-390/)

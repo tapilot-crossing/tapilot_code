@@ -1,7 +1,7 @@
 # Tapilot-Crossing: Benchmarking and Evolving LLMs Towards Interactive Data Analysis Agents
 
 
-[![License](https://img.shields.io/badge/License-CC%20By%20NC%204.0-orange.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
+[![License](https://img.shields.io/badge/License-CC%20By%20SA%204.0-orange.svg)](https://creativecommons.org/licenses/by-sa/4.0/deed.en)
 [![Data Link](https://img.shields.io/badge/Download-data-green.svg)]([https://bird-bench.github.io/](https://huggingface.co/datasets/patrickNLP/tapilot-crossing/tree/main))
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10+-teal.svg)](https://www.python.org/downloads/release/python-390/)
 [![Project Page 1.8+](https://img.shields.io/badge/project-page-pink.svg)](https://tapilot-crossing.github.io/)

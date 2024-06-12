@@ -104,9 +104,9 @@ def process_python_output(stdout):
 def format_code(code_gen, root_base):
     for line in code_gen.split("\n"):
         if "pd.read_csv(" in line:
-            if "ATP" in line:
+            if "atp_tennis" in line:
                 new_line = line.replace("atp_tennis.csv", os.path.join(root_base, "atp_tennis.csv"))
-            elif "credit" in line:
+            elif "credit_customers" in line:
                 new_line = line.replace("credit_customers.csv", os.path.join(root_base, "credit_customers.csv"))
             elif "fastfood" in line:
                 new_line = line.replace("fastfood.csv", os.path.join(root_base, "fastfood.csv"))

@@ -42,7 +42,7 @@ if __name__ == '__main__':
         decision_company = json.load(f_r) 
 
     data_dirs = collect_data_dirs(args.data_path, args.data_select)
-    tapilot_model = tapilot_agent(data_dirs, args.output_path, engine_name, args.model_version, decision_company)
+    tapilot_model = tapilot_agent(data_dirs, args.output_path, engine_name, args.model_version, decision_company, args.data_path)
 
     if args.model_version == "base":
         tapilot_model.multi_choice_base(args.data_select)

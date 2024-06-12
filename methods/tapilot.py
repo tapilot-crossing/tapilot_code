@@ -6,7 +6,7 @@ from prompts import pre_prompt_func_names_user, pre_prompt_func_names_AI, prompt
 from utils import get_llm_response, process_python_output, capture_output, format_code, remove_pickle_code, find_last_template
 
 class tapilot_agent:
-    def __init__(self, data_dirs, output_path, llm_engine, model_version, decision_company):
+    def __init__(self, data_dirs, output_path, llm_engine, model_version, decision_company, data_path):
         """
         Initializes the parameters of tapilot agent
 
@@ -20,6 +20,7 @@ class tapilot_agent:
         self.decision_company = decision_company
         self.engine_name = llm_engine.replace("-", "_")
         self.role = 'assistant'
+        self.data_path = data_path.replace("interaction_data", "resource")
 
 
     def predict_private_functions_base_agent(self):
@@ -42,7 +43,7 @@ class tapilot_agent:
                 continue
 
             count_save += 1
-            with open(os.path.join(root, 'src/prompt_code_hist.json'), 'r') as f_w:  
+            with open(os.path.join(root, 'reference/prompt_code_hist.json'), 'r') as f_w:  
                 prompt_code_hist_list = json.load(f_w)
 
             # The standard input format of GPTs: list of dicts which stores dialouge history
@@ -75,7 +76,7 @@ class tapilot_agent:
         llm_response_dict = {}
         count_save = 0
         count_all = 0
-        save_dir = os.path.join(self.output_path, 'private/normal/code_gen_' + self.model_version +  '_' + self.engine_name + '.json')
+        save_dir = os.path.join(self.output_path, 'normal/code_gen_' + self.model_version +  '_' + self.engine_name + '.json')
         try:
             with open(save_dir, 'r') as f:
                 llm_response_dict = json.load(f)
@@ -88,7 +89,7 @@ class tapilot_agent:
 
             count_all += 1
             count_save += 1
-            with open(os.path.join(root, 'src/prompt_code_hist.json'), 'r') as f_w:  
+            with open(os.path.join(root, 'reference/prompt_code_hist.json'), 'r') as f_w:  
                 prompt_code_hist_list = json.load(f_w)
                 if self.model_version == "base":
                     prompt_code_hist_list[-1]["content"] = ""
@@ -166,7 +167,7 @@ class tapilot_agent:
                 continue
 
             count_save += 1
-            with open(os.path.join(root, "src/prompt_code_hist.txt"), 'r') as f_j: 
+            with open(os.path.join(root, "reference/prompt_code_hist.txt"), 'r') as f_j: 
                 prompt_AIR = f_j.read()
                 
             cut_idx_1 = prompt_AIR.find("[USER (data scientist)]")
@@ -241,7 +242,7 @@ class tapilot_agent:
                 continue
 
             count_save += 1
-            with open(os.path.join(root, "src/prompt_code_hist.txt"), 'r') as f_j: 
+            with open(os.path.join(root, "reference/prompt_code_hist.txt"), 'r') as f_j: 
                 prompt_AIR = f_j.read()
                 
             cut_idx_1 = prompt_AIR.find("[USER (data scientist)]")
@@ -325,7 +326,7 @@ class tapilot_agent:
 
             count_save += 1
             # The standard input format of GPTs: list of dicts which stores dialouge history
-            with open(os.path.join(root, "src/prompt_code_hist.json"), 'r') as f_j: 
+            with open(os.path.join(root, "reference/prompt_code_hist.json"), 'r') as f_j: 
                 prompt_AIR = json.load(f_j)
                 dial_hist_teacher = prompt_AIR[:-2]
                 try:
@@ -413,7 +414,7 @@ class tapilot_agent:
                 continue
 
             count_save += 1
-            with open(os.path.join(root, "src/prompt_code_hist.txt"), 'r') as f_j: 
+            with open(os.path.join(root, "reference/prompt_code_hist.txt"), 'r') as f_j: 
                 prompt_hist = f_j.read()
 
             if "private" in root:
@@ -525,11 +526,14 @@ class tapilot_agent:
 
             ### Step 01: Generate code for the multi-choice question for only once ###
             save_cnt += 1
-            with open(os.path.join(root, "src/ref_code_hist.py"), 'r') as f_r:  
+            with open(os.path.join(root, "reference/ref_code_hist.py"), 'r') as f_r:  
                 hist_code = f_r.read() 
+                hist_code = hist_code.replace("pd.read_csv(os.path.join(sys.argv[1], ", "pd.read_csv(")
+                hist_code = hist_code.replace(".csv'))", ".csv')")
+                hist_code = hist_code.replace("sys.path.append(sys.argv[1])", "")
 
             # The standard input format of GPTs: list of dicts which stores dialouge history
-            with open(os.path.join(root, "src/prompt_code_hist.json"), 'r') as f_j: 
+            with open(os.path.join(root, "reference/prompt_code_hist.json"), 'r') as f_j: 
                 prompt_hist = json.load(f_j)
             
             prompt_hist[-1]["content"] = prompt_hist[-1]["content"] + " I will generate code between <code>...</code> below, which can assist me to answer the question in this step.\n<code>"
@@ -542,16 +546,29 @@ class tapilot_agent:
             ### Step 02: Execute the code generated from Step 01, and make final choice ###
             llm_response_dict_01[root] = message_llm
             idx_1 = message_llm.find("<code>")
+            if idx_1 == -1:
+                idx_1 = message_llm.find("'''")
+                if idx_1 == -1:
+                    idx_1 = message_llm.find("```python")
+                    
             idx_2 = message_llm.find("</code>")
+            if idx_2 == -1:
+                idx_2 = message_llm.rfind("'''")
+                if idx_2 == -1:
+                    idx_2 = message_llm.rfind("```")
+                    
             if idx_1 != -1 and idx_2 != -1:
-                code_gen = message_llm[idx_1:idx_2].replace("<code>", "")
+                code_gen = message_llm[idx_1:idx_2].replace("<code>", "").replace("'''", "").replace("```python", "")
             else:
                 code_gen = message_llm[:idx_2]
 
-            code_gen = format_code(code_gen, self.data_dirs)
             hist_code = remove_pickle_code(hist_code)
             code_pred = hist_code + "\n" + code_gen
             code_pred = re.sub(r'(?:[ \t]*(?:\r?\n)){3,}', '\n\n', code_pred)
+            code_pred = code_pred.replace("pd.read_csv(os.path.join(sys.argv[1], ", "pd.read_csv(")
+            code_pred = code_pred.replace(".csv'))", ".csv')")
+            code_pred = code_pred.replace("sys.path.append(sys.argv[1])", "")
+            code_pred = format_code(code_pred, self.data_path)
 
             with capture_output() as (out, err):
                 try:
@@ -583,7 +600,7 @@ class tapilot_agent:
             message_obj = prompt_hist
 
             '''For GPT family only'''
-            llm_response = get_llm_response(message_obj, engine=self.llm_engine)
+            llm_response = get_llm_response(message_obj, engine=self.llm_engine, max_tokens=500)
             message_llm = llm_response["choices"][0]["message"]["content"]
             llm_response_dict[root] = message_llm
 
@@ -616,7 +633,7 @@ class tapilot_agent:
             if root in llm_response_dict_AIR_pseudo and llm_response_dict_AIR_pseudo[root] != "Failed!":
                 continue
 
-            with open(os.path.join(root, "src/prompt_code_hist.json"), 'r') as f_j: 
+            with open(os.path.join(root, "reference/prompt_code_hist.json"), 'r') as f_j: 
                 prompt_AIR = json.load(f_j)
                 try:
                     dial_hist_student = prompt_AIR[:-1]
@@ -643,7 +660,7 @@ class tapilot_agent:
             message_obj = dial_hist_teacher
 
             '''For GPT family only'''
-            llm_response = get_llm_response(message_obj)
+            llm_response = get_llm_response(message_obj, engine=self.llm_engine)
             message_llm = llm_response["choices"][0]["message"]["content"]
 
             student_AI = {"role": "assistant"}
@@ -660,7 +677,7 @@ class tapilot_agent:
             message_obj = dial_hist_teacher
 
             '''For GPT family only'''
-            llm_response = get_llm_response(message_obj)
+            llm_response = get_llm_response(message_obj, engine=self.llm_engine)
             message_llm_pseudo = llm_response["choices"][0]["message"]["content"]
             cut_idx = message_llm_pseudo.find("<pseudocode>")
             if cut_idx != -1:
@@ -709,10 +726,13 @@ class tapilot_agent:
                 except KeyError:
                     continue
 
-            with open(os.path.join(root, "src/ref_code_hist.py"), 'r') as f_r:  
+            with open(os.path.join(root, "reference/ref_code_hist.py"), 'r') as f_r:  
                 hist_code = f_r.read() 
+                hist_code = hist_code.replace("pd.read_csv(os.path.join(sys.argv[1], ", "pd.read_csv(")
+                hist_code = hist_code.replace(".csv'))", ".csv')")
+                hist_code = hist_code.replace("sys.path.append(sys.argv[1])", "")
 
-            with open(os.path.join(root, "src/prompt_code_hist.txt"), 'r') as f_w:  
+            with open(os.path.join(root, "reference/prompt_code_hist.txt"), 'r') as f_w:  
                 prompt_hist = f_w.read() 
 
             dialogue_idx1 = prompt_hist.rfind("Interactions begin:")
@@ -761,22 +781,24 @@ class tapilot_agent:
             react_prompt = re.sub(r'(?:[ \t]*(?:\r?\n)){3,}', '\n\n', react_prompt)
 
             out_fn = "prompt_" + self.model_version + "_analysis_turn_1.txt"
-            with open(os.path.join(root, "src/" + out_fn), 'w') as f_out:  
+            with open(os.path.join(root, "reference/" + out_fn), 'w') as f_out:  
                 f_out.write(react_prompt) 
             
             message_obj = [{"role": self.role, "content": react_prompt}]
 
             '''For GPT family only'''
-            llm_response = get_llm_response(message_obj, engine=self.llm_engine)
+            llm_response = get_llm_response(message_obj, engine=self.llm_engine, max_tokens=500)
             message_llm = llm_response["choices"][0]["message"]["content"]
 
             code_histo = ""
             for i in range(max_turn):
                 idx_1 = message_llm.find("'''")
                 idx_2 = message_llm.rfind("'''")
-                code_gen = message_llm[idx_1:idx_2].replace("'''", "")
+                if idx_1 == idx_2:
+                    code_gen = message_llm[:idx_2].replace("'''", "")
+                else:
+                    code_gen = message_llm[idx_1:idx_2].replace("'''", "")
 
-                code_gen = format_code(code_gen, self.data_dirs)
                 code_histo = remove_pickle_code(code_histo)
                 code_histo = code_histo + code_gen + "\n\n"
                 hist_code = remove_pickle_code(hist_code)
@@ -784,6 +806,7 @@ class tapilot_agent:
                 code_pred = hist_code + "\n" + code_histo
                 code_pred = code_pred.replace("target_customer_segments = [1, 2]", "")
                 code_pred = re.sub(r'(?:[ \t]*(?:\r?\n)){3,}', '\n\n', code_pred)
+                code_pred = format_code(code_pred, self.data_path)
 
                 with capture_output() as (out, err):
                     try:
@@ -821,13 +844,13 @@ class tapilot_agent:
                 react_prompt = re.sub(r'(?:[ \t]*(?:\r?\n)){3,}', '\n\n', react_prompt)
 
                 out_fn = "prompt_" + self.model_version + "_analysis_turn_" + str(i+2) + ".txt"
-                with open(os.path.join(root, "src/" + out_fn), 'w') as f_out:  
+                with open(os.path.join(root, "reference/" + out_fn), 'w') as f_out:  
                     f_out.write(react_prompt) 
 
                 message_obj = [{"role": self.role, "content": react_prompt}]
 
                 '''For GPT family only'''
-                llm_response = get_llm_response(message_obj, engine=self.llm_engine)
+                llm_response = get_llm_response(message_obj, engine=self.llm_engine, max_tokens=500)
                 message_llm = llm_response["choices"][0]["message"]["content"]
 
                 if "Terminate" in message_llm:

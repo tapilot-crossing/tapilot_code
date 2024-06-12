@@ -37,7 +37,7 @@ def plotqa_base(all_roots, output_path, llm_engine, role='assistant'):
             continue
 
         save_cnt += 1
-        with open(os.path.join(root, "src/prompt_code_hist.txt"), 'r') as f_j: 
+        with open(os.path.join(root, "reference/prompt_code_hist.txt"), 'r') as f_j: 
             prompt_hist = f_j.read()
         
         idx_cut_1 = prompt_hist.find("You are a data scientist with an impressive array of skills")
@@ -63,7 +63,7 @@ def plotqa_base(all_roots, output_path, llm_engine, role='assistant'):
         json.dump(llm_response_dict_02, f_ou, indent = 4)
 
 
-def plotqa_agent(all_roots, output_path, llm_engine, role='assistant'):
+def plotqa_agent(all_roots, output_path, data_path, llm_engine, role='assistant'):
     llm_response_dict_01 = {}
     llm_response_dict = {}
     save_cnt = 0
@@ -88,10 +88,10 @@ def plotqa_agent(all_roots, output_path, llm_engine, role='assistant'):
         if root in llm_response_dict and llm_response_dict[root] != "Failed!":
             continue
         save_cnt += 1
-        with open(os.path.join(root, "src/ref_code_hist.py"), 'r') as f_r:  
+        with open(os.path.join(root, "reference/ref_code_hist.py"), 'r') as f_r:  
             hist_code = f_r.read() 
 
-        with open(os.path.join(root, "src/prompt_code_hist.txt"), 'r') as f_j: 
+        with open(os.path.join(root, "reference/prompt_code_hist.txt"), 'r') as f_j: 
             prompt_hist = f_j.read()
         
         prompt_hist = prompt_hist + " I will generate code which can assist me to answer the question between <code> MY-PYTHON-CODE </code> in this step. And I will use a 'print()' to print out my interested value at the end of my code.\n\n<code>"
@@ -109,7 +109,7 @@ def plotqa_agent(all_roots, output_path, llm_engine, role='assistant'):
         else:
             code_gen = message_llm[:idx_2]
 
-        code_gen = format_code(code_gen)
+        code_gen = format_code(code_gen, data_path)
         hist_code = remove_pickle_code(hist_code)
         
         code_pred = hist_code + "\n" + code_gen
@@ -177,8 +177,8 @@ if __name__ == '__main__':
     data_dirs = collect_data_dirs(args.data_path)
     if args.model_version == "base":
         plotqa_base(data_dirs, args.output_path, llm_engine)
-    elif args.model_version == "agent":
-        plotqa_agent(data_dirs, args.output_path, llm_engine)
+    elif args.model_version == "agent" or args.model_version == "inter_agent":
+        plotqa_agent(data_dirs, args.output_path, args.data_path, llm_engine)
     else:
         print("Wrong model_version!")
         raise AssertionError

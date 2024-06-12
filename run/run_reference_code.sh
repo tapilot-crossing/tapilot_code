@@ -3,7 +3,7 @@
 # Your path to tapilot dialogue data  
 DATA_PATH="TAPILOT-DATA-PATH" # For example: /YOUR-DIR-PREFIX/data/interaction_data
 # The path to all resources files like all csv files and decision_company.json
-csv_path="CSV-FILES-PATH" # For example: /YOUR-DIR-PREFIX/data/src
+csv_path="CSV-FILES-PATH" # For example: /YOUR-DIR-PREFIX/data/resource
 
 success_count=0  
 failed_count=0
@@ -17,7 +17,7 @@ do
         cd "$dir" 
         cd ".."
   
-        python3 "src/ref_code_all.py"  $csv_path
+        python3 "reference/ref_code_all.py"  $csv_path
   
         if [ $? -eq 0 ]; then  
             success_count=$((success_count + 1))  

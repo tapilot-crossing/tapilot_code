@@ -31,7 +31,7 @@ def prepare_code_head(root, llm_response_dict_func_02):
     if cut_idx_2 != -1:
         code_head = prompt_curr[cut_idx_2:].replace("'''", "")
     else:
-        raise AssertionError
+        code_head = ""
     
     return private_func, code_head
 
@@ -62,7 +62,7 @@ def main(llm_response_path, private_func_path, code_seg_fn, code_pred_fn):
 
 
     for root, llm_resp in llm_response.items(): 
-        code_base_path = os.path.join(root, 'src/ref_code_hist.py')
+        code_base_path = os.path.join(root, 'reference/ref_code_hist.py')
         with open(code_base_path, "r") as f_code:
             code_base = f_code.read()
 

@@ -38,22 +38,22 @@ def llm_ask_for_clarification(all_roots, output_path, llm_engine, role='assistan
 
         count_save += 1
         try:
-            with open(os.path.join(root, 'src/prompt_code_hist_origin.json'), 'r') as f_w:  
+            with open(os.path.join(root, 'reference/prompt_code_hist_origin.json'), 'r') as f_w:  
                 list_prompt = json.load(f_w)
 
-            with open(os.path.join(root, 'src/prompt_code_hist_origin.txt'), 'r') as f_w:  
+            with open(os.path.join(root, 'reference/prompt_code_hist_origin.txt'), 'r') as f_w:  
                 tmp = f_w.read()
 
         except FileNotFoundError:
-            src_file = os.path.join(root, 'src/prompt_code_hist.json')
-            dst_file = os.path.join(root, 'src/prompt_code_hist_origin.json')
+            src_file = os.path.join(root, 'reference/prompt_code_hist.json')
+            dst_file = os.path.join(root, 'reference/prompt_code_hist_origin.json')
             shutil.copy(src_file, dst_file)
 
-            src_file = os.path.join(root, 'src/prompt_code_hist.txt')
-            dst_file = os.path.join(root, 'src/prompt_code_hist_origin.txt')
+            src_file = os.path.join(root, 'reference/prompt_code_hist.txt')
+            dst_file = os.path.join(root, 'reference/prompt_code_hist_origin.txt')
             shutil.copy(src_file, dst_file)
 
-        with open(os.path.join(root, 'src/prompt_code_hist_origin.json'), 'r') as f_w:  
+        with open(os.path.join(root, 'reference/prompt_code_hist_origin.json'), 'r') as f_w:  
             list_prompt = json.load(f_w)
 
         cut_idx = list_prompt[-2]["content"].find("My template of code snippet is:")
@@ -101,7 +101,7 @@ def user_simulator(all_roots, output_path, llm_engine, save_dir_question, role='
         with open(os.path.join(root, 'ref_code.py'), 'r') as f_w: 
             ref_code = f_w.read() 
 
-        with open(os.path.join(root, 'src/prompt_code_hist_origin.json'), 'r') as f_w:  
+        with open(os.path.join(root, 'reference/prompt_code_hist_origin.json'), 'r') as f_w:  
             list_prompt = json.load(f_w)
             cut_idx = list_prompt[-2]["content"].find("My template of code snippet is:")
             list_prompt[-2]["content"] = list_prompt[-2]["content"][:cut_idx] + "\n" +  clarification_user_01
@@ -145,7 +145,7 @@ def save_prompts(all_roots, save_dir_question, save_dir_answer):
         question_all = json.load(f)
 
     for root in tqdm(all_roots, desc="Processing save prompts:"):
-        with open(os.path.join(root, 'src/prompt_code_hist_origin.json'), 'r') as f_w:  
+        with open(os.path.join(root, 'reference/prompt_code_hist_origin.json'), 'r') as f_w:  
             list_prompt = json.load(f_w)
             
             list_prompt[-2]["content"] = list_prompt[-2]["content"]
@@ -168,10 +168,10 @@ def save_prompts(all_roots, save_dir_question, save_dir_answer):
         prompt_hist = list2prompt(list_prompt)
         prompt_hist = re.sub(r'(?:[ \t]*(?:\r?\n)){3,}', '\n\n', prompt_hist)
                 
-        with open(os.path.join(root, 'src/prompt_code_hist.json'), 'w') as f_w:  
+        with open(os.path.join(root, 'reference/prompt_code_hist.json'), 'w') as f_w:  
             json.dump(list_prompt, f_w, indent=4)
 
-        with open(os.path.join(root, 'src/prompt_code_hist.txt'), 'w') as f_w:  
+        with open(os.path.join(root, 'reference/prompt_code_hist.txt'), 'w') as f_w:  
             f_w.write(prompt_hist)
 
 

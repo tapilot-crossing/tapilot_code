@@ -16,7 +16,7 @@ def prepare_code_head(root):
     if cut_idx_2 != -1:
         code_head = prompt_curr[cut_idx_2+3:]
     else:
-        raise AssertionError
+        code_head = ""
     
     return code_head
 
@@ -86,7 +86,7 @@ def main(llm_response_path, code_seg_fn, code_pred_fn):
         llm_response = json.load(f_json)
 
     for root, llm_resp in llm_response.items(): 
-        code_base_path = os.path.join(root, 'src/ref_code_hist.py')
+        code_base_path = os.path.join(root, 'reference/ref_code_hist.py')
         with open(code_base_path, "r") as f_code:
             code_base = f_code.read()
 

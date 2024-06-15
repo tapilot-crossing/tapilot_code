@@ -3,7 +3,7 @@
 # Your path to tapilot dialogue data  
 DATA_PATH="TAPILOT-DATA-PATH" # For example: /YOUR-DIR-PREFIX/data/interaction_data
 # The path to all resources files like all csv files and decision_company.json
-CSV_PATH="CSV-FILES-PATH" # For example: /YOUR-DIR-PREFIX/data/src
+CSV_PATH="CSV-FILES-PATH" # For example: /YOUR-DIR-PREFIX/data/resource
 # The python code extracted from LLM response generated in postprocessing
 FIL_NAME="YOUR-CODE-GEN-PYTHON-FILE-NAME" # For example: pred_code.py
   

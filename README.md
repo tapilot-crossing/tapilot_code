@@ -40,8 +40,8 @@ Data is further organized into four modes reflecting the nature of the interacti
 ### Fourth Layer: Interaction Turns
 The final layer is organized by the interaction turns themselves, providing a granular view of the dataset.
 
-### 2. Content Files of `data`
-
+### 2. Content Files of `data` (Can be downloaded from [here](https://drive.google.com/file/d/1LWqY_BvdRhvlklWOLXl5w-2zTotkgZPg/view?usp=sharing).)
+- `interaction_data_json`: Contains all the interaction data of tapilot data in **JSONL** format. They are divided into four modes: 1. Normal Mode (`normal.jsonl`); 2. Private Mode (`private.jsonl`); 3. Action Mode (5 different action types, e.g., `action_plotqa.jsonl`); 4. Private Action Mode (`private_action_correction.jsonl`).
 - `interaction_data`: Contains all the interaction data of tapilot data. For each interaction turn (e.g., `turn_1_short_1` for short interactions, `turn_1` for long interactions), the following files are included:
   - `meta_data.json`: Contains metadata about the problem, including `result_type`, `action`, and `data_id`.
   - `ref_result` and `pred_result` directories: Store files (pickles or PNGs) generated from the reference and prediction codes, respectively.
@@ -62,6 +62,15 @@ The visualization of the `tapilot_data` directory structure which should be stor
 
 ```
 data
+├── interaction_data_json
+  ├── action_analysis.jsonl
+  ├── action_bg.jsonl
+  ├── action_correction.jsonl
+  ├── action_plotqa.jsonl
+  ├── action_una.jsonl
+  ├── normal.jsonl
+  ├── private_action_correction.jsonl
+  └── private.jsonl
 ├── interaction_data
   ├── atp_tennis
       ├── Carlos
